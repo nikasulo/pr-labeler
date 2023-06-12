@@ -13,6 +13,7 @@ inputs:
     required: true
   action-type:
     description: The event that occured on the PR
+    required: true
   approved-labels:
     - "ready-for-merge"
   ready-for-review-labels:
