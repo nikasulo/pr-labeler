@@ -20,6 +20,7 @@ export async function run(): Promise<void> {
     console.log(`labels: ${getLabels()}`)
     await addLabels(client);
   } catch (error) {
+    console.log(error)
     if (error instanceof Error) core.setFailed(error.message);
   }
 }
