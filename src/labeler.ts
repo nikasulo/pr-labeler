@@ -18,7 +18,7 @@ export async function run(): Promise<void> {
     console.log(client)
     console.log(`PR number: ${getPrNumber()}`)
     console.log(`labels: ${getLabels()}`)
-    await addLabels(client);
+    // await addLabels(client);
   } catch (error: any) {
     core.error(error)
     if (error instanceof Error) core.setFailed(error.message);
