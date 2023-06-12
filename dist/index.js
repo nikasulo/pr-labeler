@@ -42,14 +42,23 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
+const LABELS = {
+    APPROVED_LABELS: ['ready-for-merge'],
+    READY_FOR_REVIEW_LABELS: ['ready-for-review']
+};
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const repoToken = getRepoToken();
             const client = newClient(repoToken);
-            yield addLabels(client);
+            console.log(repoToken);
+            console.log(client);
+            console.log(`PR number: ${getPrNumber()}`);
+            console.log(`labels: ${getLabels()}`);
+            // await addLabels(client);
         }
         catch (error) {
+            core.error(error);
             if (error instanceof Error)
                 core.setFailed(error.message);
         }
@@ -67,13 +76,14 @@ const getPrNumber = () => {
 };
 const getLabels = () => {
     const actionType = getActionType();
-    return JSON.parse(core.getInput(`${actionType}-labels`));
+    console.log(actionType);
+    return LABELS[`${actionType}_LABELS`];
 };
 const getActionType = () => {
     return core.getInput("action-type");
 };
 const addLabels = (client) => __awaiter(void 0, void 0, void 0, function* () {
-    yield client.rest.issues.addLabels({
+    const result = yield client.rest.issues.addLabels({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
         issue_number: getPrNumber(),
