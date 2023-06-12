@@ -14,11 +14,7 @@ export async function run(): Promise<void> {
     const repoToken = getRepoToken();
     const client = newClient(repoToken);
 
-    console.log(repoToken);
-    console.log(client)
-    console.log(`PR number: ${getPrNumber()}`)
-    console.log(`labels: ${getLabels()}`)
-    // await addLabels(client);
+    await addLabels(client);
   } catch (error: any) {
     core.error(error)
     if (error instanceof Error) core.setFailed(error.message);
@@ -39,7 +35,6 @@ const getPrNumber = (): number => {
 
 const getLabels = (): string[] => {
   const actionType = getActionType();
-  console.log(actionType)
   return LABELS[`${actionType}_LABELS`];
 };
 
