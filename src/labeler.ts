@@ -39,7 +39,7 @@ const getPrNumber = (): number => {
 
 const getLabels = (): string[] => {
   const actionType = getActionType();
-  return LABELS[`${actionType}-labels`];
+  return LABELS[`${actionType}_LABELS`];
 };
 
 const getActionType = (): string => {
@@ -47,7 +47,7 @@ const getActionType = (): string => {
 };
 
 const addLabels = async (client: ClientType) => {
-  await client.rest.issues.addLabels({
+  const result = await client.rest.issues.addLabels({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: getPrNumber(),
