@@ -1,0 +1,13 @@
+name: PR Labeler
+author: Squareup Limited
+description: An action that labels PRs based on their state transitions
+inputs:
+  pr-number:
+    description: The PR number
+    required: true
+  pr-author:
+    description: The author of the PR
+    required: true
+runs:
+  using: 'node16'
+  main: 'main.js'
