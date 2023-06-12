@@ -39,6 +39,7 @@ const getPrNumber = (): number => {
 
 const getLabels = (): string[] => {
   const actionType = getActionType();
+  console.log(actionType)
   return LABELS[`${actionType}_LABELS`];
 };
 
