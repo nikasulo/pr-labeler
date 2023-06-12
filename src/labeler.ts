@@ -3,6 +3,12 @@ import * as github from "@actions/github";
 
 type ClientType = ReturnType<typeof github.getOctokit>;
 
+const LABELS: {[key: string]: string[]} = {
+  APPROVED_LABELS: ['ready-for-merge'],
+  READY_FOR_REVIEW_LABELS: ['ready-for-review']
+}
+
+
 export async function run(): Promise<void> {
   try {
     const repoToken = getRepoToken();
@@ -28,7 +34,7 @@ const getPrNumber = (): number => {
 
 const getLabels = (): string[] => {
   const actionType = getActionType();
-  return JSON.parse(core.getInput(`${actionType}-labels`));
+  return LABELS[`${actionType}-labels`];
 };
 
 const getActionType = (): string => {
