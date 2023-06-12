@@ -21,7 +21,7 @@ export async function run(): Promise<void> {
     await addLabels(client);
   } catch (error) {
     console.log(error)
-    if (error instanceof Error) core.setFailed(error.message);
+    if (error instanceof Error) core.setFailed(error);
   }
 }
 
