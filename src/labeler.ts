@@ -5,7 +5,7 @@ type ClientType = ReturnType<typeof github.getOctokit>;
 
 const LABELS: {[key: string]: string[]} = {
   READY_FOR_REVIEW_LABELS: ['ready-for-review'],
-  APPROVED: ['ready-for-merge']
+  APPROVED_LABELS: ['ready-for-merge']
 }
 
 
