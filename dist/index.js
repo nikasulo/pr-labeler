@@ -43,8 +43,8 @@ exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const LABELS = {
-    APPROVED_LABELS: ['ready-for-merge'],
-    READY_FOR_REVIEW_LABELS: ['ready-for-review']
+    READY_FOR_REVIEW_LABELS: ['ready-for-review'],
+    APPROVED: ['ready-for-merge']
 };
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -70,15 +70,24 @@ const newClient = (token) => {
 const getPrNumber = () => {
     return parseInt(core.getInput("pr-number"));
 };
+const labelName = (actionType) => {
+    return `${actionType}_LABELS`;
+};
 const getLabels = () => {
     const actionType = getActionType();
-    return LABELS[`${actionType}_LABELS`];
+    const labels = LABELS[labelName(actionType)];
+    if (labels) {
+        return labels;
+    }
+    else {
+        throw new Error("Unhandled Action Type");
+    }
 };
 const getActionType = () => {
     return core.getInput("action-type");
 };
 const addLabels = (client) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield client.rest.issues.addLabels({
+    yield client.rest.issues.addLabels({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
         issue_number: getPrNumber(),
