@@ -44,7 +44,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const LABELS = {
     READY_FOR_REVIEW_LABELS: ['ready-for-review'],
-    APPROVED: ['ready-for-merge']
+    APPROVED_LABELS: ['ready-for-merge']
 };
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
