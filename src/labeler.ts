@@ -4,8 +4,8 @@ import * as github from "@actions/github";
 type ClientType = ReturnType<typeof github.getOctokit>;
 
 const LABELS: {[key: string]: string[]} = {
-  APPROVED_LABELS: ['ready-for-merge'],
-  READY_FOR_REVIEW_LABELS: ['ready-for-review']
+  READY_FOR_REVIEW_LABELS: ['ready-for-review'],
+  APPROVED: ['ready-for-merge']
 }
 
 
@@ -25,6 +25,7 @@ const getRepoToken = (): string => {
   return core.getInput("repo-token");
 };
 
+
 const newClient = (token: string): ClientType => {
   return github.getOctokit(token);
 };
@@ -33,9 +34,20 @@ const getPrNumber = (): number => {
   return parseInt(core.getInput("pr-number"));
 };
 
+const labelName = (actionType: string): string => {
+  return `${actionType}_LABELS`
+}
+
 const getLabels = (): string[] => {
   const actionType = getActionType();
-  return LABELS[`${actionType}_LABELS`];
+
+  const labels = LABELS[labelName(actionType)]
+
+  if (labels) {
+    return labels
+  } else {
+    throw new Error("Unhandled Action Type")
+  }
 };
 
 const getActionType = (): string => {
@@ -43,7 +55,7 @@ const getActionType = (): string => {
 };
 
 const addLabels = async (client: ClientType) => {
-  const result = await client.rest.issues.addLabels({
+  await client.rest.issues.addLabels({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: getPrNumber(),
