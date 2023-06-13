@@ -42,6 +42,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
+const LABELS = {
+    READY_FOR_REVIEW_LABELS: ['ready-for-review'],
+    APPROVED_LABELS: ['ready-for-merge']
+};
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -50,6 +54,7 @@ function run() {
             yield addLabels(client);
         }
         catch (error) {
+            core.error(error);
             if (error instanceof Error)
                 core.setFailed(error.message);
         }
@@ -65,9 +70,18 @@ const newClient = (token) => {
 const getPrNumber = () => {
     return parseInt(core.getInput("pr-number"));
 };
+const labelName = (actionType) => {
+    return `${actionType}_LABELS`;
+};
 const getLabels = () => {
     const actionType = getActionType();
-    return JSON.parse(core.getInput(`${actionType}-labels`));
+    const labels = LABELS[labelName(actionType)];
+    if (labels) {
+        return labels;
+    }
+    else {
+        throw new Error("Unhandled Action Type");
+    }
 };
 const getActionType = () => {
     return core.getInput("action-type");

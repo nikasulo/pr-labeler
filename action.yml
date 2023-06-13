@@ -13,10 +13,7 @@ inputs:
     required: true
   action-type:
     description: The event that occured on the PR
-  approved-labels:
-    - "ready-for-merge"
-  ready-for-review-labels:
-    - "ready-for-review"
+    required: true
 runs:
   using: 'node16'
   main: 'dist/index.js'

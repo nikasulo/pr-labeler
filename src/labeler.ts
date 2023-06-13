@@ -3,13 +3,20 @@ import * as github from "@actions/github";
 
 type ClientType = ReturnType<typeof github.getOctokit>;
 
+const LABELS: {[key: string]: string[]} = {
+  READY_FOR_REVIEW_LABELS: ['ready-for-review'],
+  APPROVED_LABELS: ['ready-for-merge']
+}
+
+
 export async function run(): Promise<void> {
   try {
     const repoToken = getRepoToken();
     const client = newClient(repoToken);
 
     await addLabels(client);
-  } catch (error) {
+  } catch (error: any) {
+    core.error(error)
     if (error instanceof Error) core.setFailed(error.message);
   }
 }
@@ -17,6 +24,7 @@ export async function run(): Promise<void> {
 const getRepoToken = (): string => {
   return core.getInput("repo-token");
 };
+
 
 const newClient = (token: string): ClientType => {
   return github.getOctokit(token);
@@ -26,9 +34,20 @@ const getPrNumber = (): number => {
   return parseInt(core.getInput("pr-number"));
 };
 
+const labelName = (actionType: string): string => {
+  return `${actionType}_LABELS`
+}
+
 const getLabels = (): string[] => {
   const actionType = getActionType();
-  return JSON.parse(core.getInput(`${actionType}-labels`));
+
+  const labels = LABELS[labelName(actionType)]
+
+  if (labels) {
+    return labels
+  } else {
+    throw new Error("Unhandled Action Type")
+  }
 };
 
 const getActionType = (): string => {
