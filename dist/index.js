@@ -188,9 +188,13 @@ function run() {
             yield (0, helpers_1.addLabels)(client);
         }
         catch (error) {
-            console.log(error);
-            if (error instanceof Error)
+            if (error.name === "HttpError" &&
+                error.message === "Label does not exist") {
+                core.warning("Tried to remove a label that does not exist");
+            }
+            else if (error instanceof Error) {
                 core.setFailed(error);
+            }
         }
     });
 }
