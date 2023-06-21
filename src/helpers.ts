@@ -49,6 +49,12 @@ export const getActionType = (): string => {
 export const removeLabels = async (client: ClientType) => {
   const labels = getLabelsToRemove();
 
+  if (labels === undefined) {
+    const actionType = getActionType();
+
+    return core.warning(`No labels to remove for ${actionType}`);
+  }
+
   await Promise.all(
     labels.map((label) => {
       removeLabel(client, label);
@@ -57,19 +63,40 @@ export const removeLabels = async (client: ClientType) => {
 };
 
 export const removeLabel = async (client: ClientType, name: string) => {
-  return await client.rest.issues.removeLabel({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    issue_number: getPrNumber(),
-    name,
-  });
+  try {
+    return await client.rest.issues.removeLabel({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      issue_number: getPrNumber(),
+      name,
+    });
+  } catch (error: any) {
+    if (
+      error.name === "HttpError" &&
+      error.message === "Label does not exist"
+    ) {
+      core.warning(
+        `Tried to remove a label that does not exist. Label: ${name}`
+      );
+    } else {
+      core.setFailed(error);
+    }
+  }
 };
 
 export const addLabels = async (client: ClientType) => {
+  const labels = getLabels();
+
+  if (labels === undefined) {
+    const actionType = getActionType();
+
+    return core.warning(`No labels to remove for ${actionType}`);
+  }
+
   await client.rest.issues.addLabels({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: getPrNumber(),
-    labels: getLabels(),
+    labels,
   });
 };

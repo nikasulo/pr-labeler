@@ -8,8 +8,11 @@ export async function run(): Promise<void> {
     const client = newClient(repoToken);
 
     await removeLabels(client);
+
     await addLabels(client);
-  } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message);
+  } catch (error: any) {
+    if (error instanceof Error) {
+      core.setFailed(error);
+    }
   }
 }

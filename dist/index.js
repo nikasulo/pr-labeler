@@ -7,7 +7,7 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.LABELS_TO_REMOVE = exports.LABELS = void 0;
+exports.DONT_ADD_LABELS = exports.LABELS_TO_REMOVE = exports.LABELS = void 0;
 exports.LABELS = {
     READY_FOR_REVIEW_LABELS: ["ready-for-review"],
     APPROVED_LABELS: ["ready-for-merge"],
@@ -15,7 +15,9 @@ exports.LABELS = {
 exports.LABELS_TO_REMOVE = {
     READY_FOR_REVIEW_LABELS: ["ready-for-merge"],
     APPROVED_LABELS: ["ready-for-review"],
+    CONVERTED_TO_DRAFT_LABELS: ["ready-for-review", "ready-for-merge"],
 };
+exports.DONT_ADD_LABELS = ["CONVERTED_TO_DRAFT"];
 
 
 /***/ }),
@@ -102,26 +104,46 @@ const getActionType = () => {
 exports.getActionType = getActionType;
 const removeLabels = (client) => __awaiter(void 0, void 0, void 0, function* () {
     const labels = (0, exports.getLabelsToRemove)();
+    if (labels === undefined) {
+        const actionType = (0, exports.getActionType)();
+        return core.warning(`No labels to remove for ${actionType}`);
+    }
     yield Promise.all(labels.map((label) => {
         (0, exports.removeLabel)(client, label);
     }));
 });
 exports.removeLabels = removeLabels;
 const removeLabel = (client, name) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield client.rest.issues.removeLabel({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        issue_number: (0, exports.getPrNumber)(),
-        name,
-    });
+    try {
+        return yield client.rest.issues.removeLabel({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            issue_number: (0, exports.getPrNumber)(),
+            name,
+        });
+    }
+    catch (error) {
+        if (error.name === "HttpError" &&
+            error.message === "Label does not exist") {
+            core.warning(`Tried to remove a label that does not exist. Label: ${name}`);
+        }
+        else {
+            core.setFailed(error);
+        }
+    }
 });
 exports.removeLabel = removeLabel;
 const addLabels = (client) => __awaiter(void 0, void 0, void 0, function* () {
+    const labels = (0, exports.getLabels)();
+    if (labels === undefined) {
+        const actionType = (0, exports.getActionType)();
+        return core.warning(`No labels to remove for ${actionType}`);
+    }
     yield client.rest.issues.addLabels({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
         issue_number: (0, exports.getPrNumber)(),
-        labels: (0, exports.getLabels)(),
+        labels,
     });
 });
 exports.addLabels = addLabels;
@@ -179,8 +201,9 @@ function run() {
             yield (0, helpers_1.addLabels)(client);
         }
         catch (error) {
-            if (error instanceof Error)
-                core.setFailed(error.message);
+            if (error instanceof Error) {
+                core.setFailed(error);
+            }
         }
     });
 }
