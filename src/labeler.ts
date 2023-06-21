@@ -18,6 +18,7 @@ export async function run(): Promise<void> {
     if (shouldNotAddLabels()) return;
     await addLabels(client);
   } catch (error) {
+    console.log(error);
     if (error instanceof Error) core.setFailed(error.message);
   }
 }
