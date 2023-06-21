@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 
-import { LABELS_TO_REMOVE, LABELS } from "./constants";
+import { LABELS_TO_REMOVE, LABELS, DONT_ADD_LABELS } from "./constants";
 
 type ClientType = ReturnType<typeof github.getOctokit>;
 
@@ -12,6 +12,12 @@ export const getLabelsToRemove = (): string[] => {
   const labelsToRemove = LABELS_TO_REMOVE[labelNameForAction];
 
   return labelsToRemove;
+};
+
+export const shouldNotAddLabels = () => {
+  const actionType = getActionType();
+
+  return DONT_ADD_LABELS.includes(actionType);
 };
 
 export const getRepoToken = (): string => {

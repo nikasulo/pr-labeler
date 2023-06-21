@@ -1,6 +1,12 @@
 import * as core from "@actions/core";
 
-import { getRepoToken, addLabels, newClient, removeLabels } from "./helpers";
+import {
+  getRepoToken,
+  addLabels,
+  newClient,
+  removeLabels,
+  shouldNotAddLabels,
+} from "./helpers";
 
 export async function run(): Promise<void> {
   try {
@@ -8,6 +14,8 @@ export async function run(): Promise<void> {
     const client = newClient(repoToken);
 
     await removeLabels(client);
+
+    if (shouldNotAddLabels()) return;
     await addLabels(client);
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message);
