@@ -17,8 +17,14 @@ export async function run(): Promise<void> {
 
     if (shouldNotAddLabels()) return;
     await addLabels(client);
-  } catch (error) {
-    console.log(error);
-    if (error instanceof Error) core.setFailed(error);
+  } catch (error: any) {
+    if (
+      error.name === "HttpError" &&
+      error.message === "Label does not exist"
+    ) {
+      core.warning("Tried to remove a label that does not exist");
+    } else if (error instanceof Error) {
+      core.setFailed(error);
+    }
   }
 }
