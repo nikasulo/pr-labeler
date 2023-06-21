@@ -6,7 +6,7 @@ export const LABELS: { [key: string]: string[] } = {
 export const LABELS_TO_REMOVE: { [key: string]: string[] } = {
   READY_FOR_REVIEW_LABELS: ["ready-for-merge"],
   APPROVED_LABELS: ["ready-for-review"],
-  DRAFT_LABELS: ["ready-for-review", "ready-for-merge"],
+  CONVERTED_TO_DRAFT_LABELS: ["ready-for-review", "ready-for-merge"],
 };
 
-export const DONT_ADD_LABELS = ["DRAFT"];
+export const DONT_ADD_LABELS = ["CONVERTED_TO_DRAFT"];
